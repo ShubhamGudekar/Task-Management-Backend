@@ -1,10 +1,14 @@
 package repository
 
 import (
+	user_errors "Task-Management-Backend/internal/errors"
 	"Task-Management-Backend/internal/infrastructure"
 	"Task-Management-Backend/internal/model"
+	"errors"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 func HashPassword(password string) (string, error) {
@@ -22,7 +26,9 @@ func CreateUser(user *model.User) (*model.User, error) {
 	user.Password = hashedPassword
 
 	if err := infrastructure.DB.Create(user).Error; err != nil {
-		return nil, err
+		if strings.Contains(err.Error(), "duplicate key value") {
+			return nil, user_errors.ErrEmailAlreadyRegistered
+		}
 	}
 	return user, nil
 }
@@ -38,7 +44,9 @@ func GetAllUsers() ([]model.User, error) {
 func GetUserByID(id string) (*model.User, error) {
 	var user model.User
 	if err := infrastructure.DB.First(&user, id).Error; err != nil {
-		return nil, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, user_errors.ErrUserNotFound
+		}
 	}
 	return &user, nil
 }

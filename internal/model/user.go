@@ -1,17 +1,12 @@
 package model
 
 import (
-	"time"
-
 	"gorm.io/gorm"
 )
 
 type User struct {
-	Id        int `gorm:"primaryKey"`
-	Name      string
-	Email     string
-	Password  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	gorm.Model
+	Name     string `gorm:"not null"`
+	Email    string `gorm:"unique;not null"`
+	Password string `gorm:"not null"`
 }
