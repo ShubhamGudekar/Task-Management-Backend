@@ -7,7 +7,7 @@ import (
 )
 
 func MigrateDB() {
-	if err := infrastructure.DB.AutoMigrate(&model.User{}); err != nil {
+	if err := infrastructure.DB.AutoMigrate(&model.User{}, &model.Task{}); err != nil {
 		panic(fmt.Sprintf("Failed to migrate tables: %v", err))
 	}
 }
