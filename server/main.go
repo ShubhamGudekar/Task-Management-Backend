@@ -24,5 +24,9 @@ func main() {
 	router.PUT("/users/:id", controller.UpdateUserById)
 	router.DELETE("/users/:id", controller.DeleteUserById)
 
+	// Task Routes
+	router.POST("/tasks", controller.CreateTask)
+	router.GET("/tasks", controller.GetAllTasks)
+
 	router.Run()
 }
