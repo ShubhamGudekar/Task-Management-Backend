@@ -7,6 +7,7 @@ type TaskRequest struct {
 	Title    string
 	DueDate  time.Time
 	Priority string
+	Status   string
 }
 
 type TaskResponse struct {

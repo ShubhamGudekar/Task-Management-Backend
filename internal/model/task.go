@@ -26,10 +26,10 @@ const (
 	PriorityHigh   = "high"
 )
 
-func IsValidStatus(status string) bool {
-	return status == StatusPending || status == StatusOngoing || status == StatusComplete
+func (t Task) IsValidStatus() bool {
+	return t.Status == StatusPending || t.Status == StatusOngoing || t.Status == StatusComplete
 }
 
-func IsValidPriority(priority string) bool {
-	return priority == PriorityLow || priority == PriorityMedium || priority == PriorityHigh
+func (t Task) IsValidPriority() bool {
+	return t.Priority == PriorityLow || t.Priority == PriorityMedium || t.Priority == PriorityHigh
 }
