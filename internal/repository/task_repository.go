@@ -25,11 +25,12 @@ func GetAllTasks() ([]model.Task, error) {
 }
 
 func GetAllTaskByUserId(id string) ([]model.Task, error) {
-	var tasks []model.Task
-	if err := infrastructure.DB.Where("UserId=?", id).Find(&tasks).Error; err != nil {
+	var user model.User
+	if err := infrastructure.DB.Preload("Tasks").First(&user, id).Error; err != nil {
 		return nil, err
 	}
-	return tasks, nil
+
+	return user.Tasks, nil
 
 }
 
