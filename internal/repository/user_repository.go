@@ -7,23 +7,10 @@ import (
 	"errors"
 	"strings"
 
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	return string(bytes), err
-}
-
 func CreateUser(user *model.User) (*model.User, error) {
-
-	// Hash the password before saving
-	hashedPassword, err := HashPassword(user.Password)
-	if err != nil {
-		return nil, err
-	}
-	user.Password = hashedPassword
 
 	if err := infrastructure.DB.Create(user).Error; err != nil {
 		if strings.Contains(err.Error(), "duplicate key value") {
@@ -53,12 +40,6 @@ func GetUserByID(id string) (*model.User, error) {
 
 func UpdateUser(user *model.User) (*model.User, error) {
 
-	hashedPassword, err := HashPassword(user.Password)
-	if err != nil {
-		return nil, err
-	}
-	user.Password = hashedPassword
-
 	if err := infrastructure.DB.Save(user).Error; err != nil {
 		return nil, err
 	}
@@ -71,4 +52,12 @@ func DeleteUser(user *model.User) (*model.User, error) {
 		return nil, err
 	}
 	return user, nil
+}
+
+func GetUserByEmail(email string) (*model.User, error) {
+	var user model.User
+	if err := infrastructure.DB.First(&user, "email = ?", email).Error; err != nil {
+		return nil, user_errors.ErrUserNotFound
+	}
+	return &user, nil
 }

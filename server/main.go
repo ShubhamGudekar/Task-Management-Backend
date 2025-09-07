@@ -17,8 +17,11 @@ func init() {
 func main() {
 	router := gin.Default()
 
+	// Auth Routes
+	router.POST("/signup", controller.SignUp)
+	router.POST("/login", controller.Login)
+
 	// User Routes
-	router.POST("/users", controller.CreateUser)
 	router.GET("/users", controller.GetAllUsers)
 	router.GET("/users/:id", controller.GetUserById)
 	router.PUT("/users/:id", controller.UpdateUserById)

@@ -10,25 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CreateUser(c *gin.Context) {
-	var req dto.UserRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	userResponse, err := service.CreateUser(&req)
-	if err != nil {
-		if errors.Is(err, user_errors.ErrEmailAlreadyRegistered) {
-			c.JSON(http.StatusConflict, gin.H{"error": user_errors.ErrEmailAlreadyRegistered.Error()})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusCreated, gin.H{"user": userResponse})
-}
-
 func GetAllUsers(c *gin.Context) {
 
 	users, err := service.GetAllUsers()

@@ -56,6 +56,15 @@ func GetUserByID(id string) (*dto.UserResponse, error) {
 	return &userResponse, nil
 }
 
+func GetUserByEmail(email string) (*model.User, error) {
+
+	user, err := repository.GetUserByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func UpdateUser(id string, userRequest *dto.UserRequest) (*dto.UserResponse, error) {
 
 	user, err := repository.GetUserByID(id)
