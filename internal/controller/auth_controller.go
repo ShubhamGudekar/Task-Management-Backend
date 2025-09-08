@@ -5,6 +5,7 @@ import (
 	user_errors "Task-Management-Backend/internal/errors"
 	"Task-Management-Backend/internal/service"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -67,8 +68,8 @@ func Login(c *gin.Context) {
 	// Create a new token object
 	var expiryTime int = 15 * 60
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":     user.ID,
-		"expiry": time.Now().Add(time.Duration(expiryTime)).Unix(),
+		"id":     fmt.Sprintf("%v", user.ID),
+		"expiry": time.Now().Add(time.Duration(expiryTime) * time.Second).Unix(),
 	})
 
 	// Get Secret from env variables
