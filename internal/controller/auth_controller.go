@@ -3,6 +3,7 @@ package controller
 import (
 	"Task-Management-Backend/internal/dto"
 	user_errors "Task-Management-Backend/internal/errors"
+	"Task-Management-Backend/internal/repository"
 	"Task-Management-Backend/internal/service"
 	"errors"
 	"fmt"
@@ -19,14 +20,14 @@ func SignUp(c *gin.Context) {
 	// Map Request Body
 	var req dto.UserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 
 	// Encrpyt Passowrd
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process password"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to process password"})
 		return
 	}
 	req.Password = string(hashedPassword)
@@ -38,7 +39,7 @@ func SignUp(c *gin.Context) {
 			c.JSON(http.StatusConflict, gin.H{"error": user_errors.ErrEmailAlreadyRegistered.Error()})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create user"})
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"user": userResponse})
@@ -48,20 +49,20 @@ func Login(c *gin.Context) {
 	// Map Request Body
 	var req dto.UserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 
 	// Get User details from database
 	user, err := service.GetUserByEmail(req.Email)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Invalid Email or Password"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "invalid email or password"})
 		return
 	}
 
 	// Validate Password
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Invalid Email or Password"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "invalid email or password"})
 		return
 	}
 
@@ -75,7 +76,7 @@ func Login(c *gin.Context) {
 	// Get Secret from env variables
 	secret := os.Getenv("JWTSECRET")
 	if secret == "" {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "JWT secret not configured"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "jwt secret not configured"})
 		return
 	}
 
@@ -87,12 +88,60 @@ func Login(c *gin.Context) {
 	}
 
 	// Set Cookie
-	// SameSite important to prevent against CRSF attacks
-	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Auth", tokenString, expiryTime, "", "", false, true)
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, gin.H{"message": "user login successful"})
 }
 
-func ForgotPassword() {
+func ForgotPassword(c *gin.Context) {
+	// Map Request Body
+	var req dto.UserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		return
+	}
 
+	// Get User details from database
+	user, err := service.GetUserByEmail(req.Email)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": user_errors.ErrUserNotFound.Error()})
+		return
+	}
+
+	//Compare if old password is re-entered
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "new password can be same as old password"})
+		return
+	}
+
+	// Encryt New Password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "failed to process password")
+		return
+	}
+
+	// Save new password
+	user.Password = string(hashedPassword)
+	_, err = repository.UpdateUser(user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "failed to update password")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "password updated successfully"})
+}
+
+func Logout(c *gin.Context) {
+	_, isExist := c.Get("user")
+	if !isExist {
+		c.JSON(http.StatusNotFound, gin.H{"error": user_errors.ErrUserNotFound.Error()})
+		return
+	}
+
+	// Delete the JWT cookie by setting its MaxAge to -1
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("Auth", "", -1, "", "", false, true)
+
+	// Respond with success message
+	c.JSON(http.StatusOK, gin.H{"message": "user logged out successfully"})
 }

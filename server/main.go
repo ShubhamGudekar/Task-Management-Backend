@@ -20,6 +20,8 @@ func main() {
 	// Auth Routes
 	router.POST("/signup", controller.SignUp)
 	router.POST("/login", controller.Login)
+	router.POST("/forgotPassword", controller.ForgotPassword)
+	router.POST("/logout", middleware.ValidateAuthorization, controller.Logout)
 
 	// User Routes
 	router.GET("/users", controller.GetAllUsers)
