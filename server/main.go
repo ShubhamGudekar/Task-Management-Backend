@@ -3,6 +3,7 @@ package main
 import (
 	"Task-Management-Backend/internal/controller"
 	"Task-Management-Backend/internal/infrastructure"
+	"Task-Management-Backend/internal/middleware"
 	"Task-Management-Backend/migrations"
 
 	"github.com/gin-gonic/gin"
@@ -24,11 +25,9 @@ func main() {
 	router.POST("/logout", middleware.ValidateAuthorization, controller.Logout)
 
 	// User Routes
-	router.GET("/users", controller.GetAllUsers)
-	router.GET("/users/:id", controller.GetUserById)
-	router.PUT("/users/:id", controller.UpdateUserById)
-	router.DELETE("/users/:id", controller.DeleteUserById)
-	router.GET("/users/:id/tasks", controller.GetAllTaskByUserId)
+	router.GET("/users", middleware.ValidateAuthorization, controller.GetUserDetails)
+	router.PUT("/users", middleware.ValidateAuthorization, controller.UpdateUser)
+	router.DELETE("/users", middleware.ValidateAuthorization, controller.DeleteUser)
 
 	// Task Routes
 	router.POST("/tasks", controller.CreateTask)

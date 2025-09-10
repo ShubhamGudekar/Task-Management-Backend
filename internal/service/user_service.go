@@ -8,7 +8,7 @@ import (
 	"github.com/jinzhu/copier"
 )
 
-func CreateUser(userRequest *dto.UserRequest) (*dto.UserResponse, error) {
+func CreateUser(userRequest *dto.SignUpRequest) (*dto.UserResponse, error) {
 	var user model.User
 	if err := copier.Copy(&user, userRequest); err != nil {
 		return nil, err

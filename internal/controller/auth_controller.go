@@ -18,7 +18,7 @@ import (
 
 func SignUp(c *gin.Context) {
 	// Map Request Body
-	var req dto.UserRequest
+	var req dto.SignUpRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
@@ -47,7 +47,7 @@ func SignUp(c *gin.Context) {
 
 func Login(c *gin.Context) {
 	// Map Request Body
-	var req dto.UserRequest
+	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
@@ -94,7 +94,7 @@ func Login(c *gin.Context) {
 
 func ForgotPassword(c *gin.Context) {
 	// Map Request Body
-	var req dto.UserRequest
+	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return

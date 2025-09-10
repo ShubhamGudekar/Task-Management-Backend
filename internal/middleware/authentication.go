@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"Task-Management-Backend/internal/model"
 	"Task-Management-Backend/internal/repository"
 	"fmt"
 	"net/http"
@@ -69,4 +70,18 @@ func ValidateAuthorization(c *gin.Context) {
 
 	// Continue to next handler
 	c.Next()
+}
+
+func GetUserFromContext(c *gin.Context) (*model.User, error) {
+	userData, isExist := c.Get("user")
+	if !isExist {
+		return nil, fmt.Errorf("user not found in context")
+	}
+
+	user, ok := userData.(*model.User)
+	if !ok {
+		return nil, fmt.Errorf("invalid user type in context")
+	}
+
+	return user, nil
 }
