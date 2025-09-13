@@ -9,7 +9,7 @@ import (
 	"github.com/jinzhu/copier"
 )
 
-func CreateTask(taskRequest dto.TaskRequest) (*dto.TaskResponse, error) {
+func CreateTask(userId uint, taskRequest dto.TaskRequest) (*dto.TaskResponse, error) {
 	var task model.Task
 	if err := copier.Copy(&task, taskRequest); err != nil {
 		return nil, err
@@ -22,6 +22,8 @@ func CreateTask(taskRequest dto.TaskRequest) (*dto.TaskResponse, error) {
 	if task.Status != "" && !task.IsValidStatus() {
 		return nil, errors.ErrInvalidTaskStatus
 	}
+
+	task.UserID = userId
 
 	createdTask, err := repository.CreateTask(&task)
 	if err != nil {
@@ -63,8 +65,8 @@ func GetAllTasksByUserId(id string) ([]dto.TaskResponse, error) {
 	return taskResponse, nil
 }
 
-func GetTaskById(id string) (*dto.TaskResponse, error) {
-	task, err := repository.GetTaskById(id)
+func GetTaskById(taskId string, userId uint) (*dto.TaskResponse, error) {
+	task, err := repository.GetTaskById(taskId, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -77,8 +79,8 @@ func GetTaskById(id string) (*dto.TaskResponse, error) {
 	return &taskResponse, nil
 }
 
-func UpdateTask(id string, taskRequest dto.TaskRequest) (*dto.TaskResponse, error) {
-	task, err := repository.GetTaskById(id)
+func UpdateTask(taskId string, userId uint, taskRequest dto.TaskRequest) (*dto.TaskResponse, error) {
+	task, err := repository.GetTaskById(taskId, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -108,8 +110,8 @@ func UpdateTask(id string, taskRequest dto.TaskRequest) (*dto.TaskResponse, erro
 	return &taskResponse, nil
 }
 
-func DeleteTaskById(id string) (*dto.TaskResponse, error) {
-	task, err := repository.GetTaskById(id)
+func DeleteTaskById(taskId string, userId uint) (*dto.TaskResponse, error) {
+	task, err := repository.GetTaskById(taskId, userId)
 	if err != nil {
 		return nil, err
 	}

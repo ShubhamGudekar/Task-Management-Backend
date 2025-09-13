@@ -34,9 +34,9 @@ func GetAllTaskByUserId(id string) ([]model.Task, error) {
 
 }
 
-func GetTaskById(id string) (*model.Task, error) {
+func GetTaskById(taskId string, userId uint) (*model.Task, error) {
 	var task model.Task
-	if err := infrastructure.DB.First(&task, id).Error; err != nil {
+	if err := infrastructure.DB.Where("id = ? AND user_id= ? ", taskId, userId).First(&task).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, task_error.ErrTaskNotFound
 		}

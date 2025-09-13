@@ -30,11 +30,11 @@ func main() {
 	router.DELETE("/users", middleware.ValidateAuthorization, controller.DeleteUser)
 
 	// Task Routes
-	router.POST("/tasks", controller.CreateTask)
-	router.GET("/tasks", controller.GetAllTasks)
-	router.GET("/tasks/:id", controller.GetTaskById)
-	router.PUT("/tasks/:id", controller.UpdateTaskById)
-	router.DELETE("/tasks/:id", controller.DeleteTaskById)
+	router.GET("/tasks", middleware.ValidateAuthorization, controller.GetAllTaskByUserId)
+	router.POST("/tasks", middleware.ValidateAuthorization, controller.CreateTask)
+	router.GET("/tasks/:id", middleware.ValidateAuthorization, controller.GetTaskById)
+	router.PUT("/tasks/:id", middleware.ValidateAuthorization, controller.UpdateTaskById)
+	router.DELETE("/tasks/:id", middleware.ValidateAuthorization, controller.DeleteTaskById)
 
 	router.Run()
 }

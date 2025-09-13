@@ -3,7 +3,6 @@ package dto
 import "time"
 
 type TaskRequest struct {
-	UserId   int
 	Title    string
 	DueDate  time.Time
 	Priority string
