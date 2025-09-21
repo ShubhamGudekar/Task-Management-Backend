@@ -3,8 +3,8 @@ package dto
 import "time"
 
 type UserRequest struct {
-	Name  string
-	Email string
+	Name  string `binding:"required,min=2,max=100"`
+	Email string `binding:"required,email"`
 }
 
 type UserResponse struct {
@@ -15,12 +15,12 @@ type UserResponse struct {
 	UpdatedAt    time.Time
 }
 type SignUpRequest struct {
-	Name     string
-	Email    string
-	Password string
+	Name     string `binding:"required,min=2,max=100"`
+	Email    string `binding:"required,email"`
+	Password string `binding:"required,min=6,max=32"`
 }
 
 type LoginRequest struct {
-	Email    string
-	Password string
+	Email    string `binding:"required,email"`
+	Password string `binding:"required,min=6,max=32"`
 }

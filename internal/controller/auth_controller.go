@@ -20,7 +20,7 @@ func SignUp(c *gin.Context) {
 	// Map Request Body
 	var req dto.SignUpRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -49,7 +49,7 @@ func Login(c *gin.Context) {
 	// Map Request Body
 	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -76,7 +76,7 @@ func Login(c *gin.Context) {
 	// Get Secret from env variables
 	secret := os.Getenv("JWTSECRET")
 	if secret == "" {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "jwt secret not configured"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Authentication service unavailable"})
 		return
 	}
 
@@ -96,7 +96,7 @@ func ForgotPassword(c *gin.Context) {
 	// Map Request Body
 	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
